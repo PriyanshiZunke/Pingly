@@ -8,6 +8,7 @@ import path from "path"
 import job from "./lib/cron.js";
 import clerkWebhook from "./webhooks/clerk.webhook.js"
 import authRoutes from "./routes/auth.route.js";
+import messagesRoutes from "./routes/messages.route.js";
 //when using type:module it is required to add .js at end 
 
 const app = express();
@@ -29,6 +30,7 @@ app.get("/health",(req,res)=>{
 })
 
 app.use("/api/auth",authRoutes);
+app.use("/api/messages",messagesRoutes);
 
     // if the public directory exists, serve the static files 
     if(fs.existsSync(publicDir)){
