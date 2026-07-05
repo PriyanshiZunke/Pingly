@@ -9,9 +9,10 @@ import job from "./lib/cron.js";
 import clerkWebhook from "./webhooks/clerk.webhook.js"
 import authRoutes from "./routes/auth.route.js";
 import messagesRoutes from "./routes/messages.route.js";
+import { app, server } from "./lib/socket.js";
 //when using type:module it is required to add .js at end 
 
-const app = express();
+
 
 const PORT = process.env.PORT;
 const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -41,7 +42,7 @@ app.use("/api/messages",messagesRoutes);
         })
     }
 
-app.listen(PORT,() => {
+server.listen(PORT,() => {
     connectDB();
     console.log(`Server is running on port ${PORT}`);
 

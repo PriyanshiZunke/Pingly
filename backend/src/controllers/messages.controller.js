@@ -1,6 +1,7 @@
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
-import { hasImageKitConfig } from "../utils/imagekit.js";
+import { hasImageKitConfig } from "../lib/imagekit.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export async function getUsersForSidebar(req, res) {
     try {
@@ -59,7 +60,7 @@ export async function getMessages(req, res){
                 { senderId: myId, receiverId: userToChatId },
                 { senderId: userToChatId, receiverId: myId },
             ]
-        }).$sort({ createdAt: 1 });
+        }).sort({ createdAt: 1 });
 
         res.status(200).json(messages);
     }catch(error){
@@ -98,6 +99,11 @@ export async function sendMessage(req, res){
 
         await newMessage.save();
 
+        const recieverSocketId = getReceiverSocketId(receiverId);
+        // only send message to the receiver if they are online
+        if(recieverSocketId){
+            io.to(recieverSocketId).emit("newMessage", newMessage);
+        }
 
 
         res.status(201).json(newMessage);
