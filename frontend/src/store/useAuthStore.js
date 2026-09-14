@@ -2,7 +2,10 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+// Use VITE_API_URL in production so socket.io connects to the backend origin
+const BASE_URL = import.meta.env.MODE === "development"
+  ? "http://localhost:3000"
+  : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/$/, "") : "/");
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
