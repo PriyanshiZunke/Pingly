@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import { axiosInstance } from "../lib/axios";
+import { getToken as getFreshToken } from "../lib/tokenService";
 import { useAuthStore } from "./useAuthStore";
 import toast from "react-hot-toast";
 
@@ -70,6 +71,13 @@ export const useChatStore = create(
         if (!selectedUser) return false;
 
         try {
+          // Ensure we have a fresh Clerk token for non-GET requests
+          try {
+            const fresh = await getFreshToken();
+            if (fresh) axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${fresh}`;
+          } catch (e) {
+            // ignore token refresh errors; request will proceed and interceptor may handle 401
+          }
           const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
           set({ messages: [...messages, res.data], composerText: "" });
           get().getConversations();
