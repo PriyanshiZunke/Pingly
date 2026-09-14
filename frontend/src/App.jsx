@@ -21,8 +21,11 @@ function App() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    if (isSignedIn) checkAuth();
-    else clearAuth();
+    // Avoid calling `checkAuth()` here to prevent a race where the
+    // Authorization header isn't yet attached. `AuthTokenSetter`
+    // registers Clerk's `getToken()` and calls `checkAuth()` after
+    // it attaches the token.
+    if (!isSignedIn) clearAuth();
   }, [checkAuth, clearAuth, isLoaded, isSignedIn]);
 
   if(!isLoaded || (isSignedIn && isCheckingAuth)) return <PageLoader />;
