@@ -5,9 +5,17 @@ import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+const allowedOrigin = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
 
-const io = new Server(server, {cors: {origin: [allowedOrigin]}});
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigin,
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
+console.log("Socket.IO allowed origin:", allowedOrigin);
 
 function getReceiverSocketId(userId) {
     return userSocketMap[userId];
