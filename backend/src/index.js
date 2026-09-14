@@ -15,7 +15,10 @@ import { app, server } from "./lib/socket.js";
 
 
 const PORT = process.env.PORT;
-const FRONTEND_URL = process.env.FRONTEND_URL;
+// Normalize FRONTEND_URL to avoid trailing-slash CORS mismatches
+const FRONTEND_URL = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
+
+console.log("FRONTEND_URL:", FRONTEND_URL);
 
 const publicDir = path.join(process.cwd(),"public");
 // we do not parse the webhook eventt data it should be in raw format
