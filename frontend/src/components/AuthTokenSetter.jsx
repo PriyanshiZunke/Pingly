@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@clerk/react";
 import { axiosInstance } from "../lib/axios";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function AuthTokenSetter() {
   const { getToken, isSignedIn } = useAuth();
@@ -12,7 +13,16 @@ export default function AuthTokenSetter() {
         try {
           const token = await getToken();
           if (!mounted) return;
-          if (token) axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+          if (token) {
+            axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            // Ensure the app's auth check runs after the token is attached
+            try {
+              const check = useAuthStore.getState().checkAuth;
+              if (typeof check === "function") check();
+            } catch (e) {
+              // ignore
+            }
+          }
         } catch (e) {
           console.error("Failed to get Clerk token:", e);
         }
