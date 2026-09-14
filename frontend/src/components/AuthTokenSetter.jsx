@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "@clerk/react";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "../store/useAuthStore";
+import { setGetToken } from "../lib/tokenService";
 
 export default function AuthTokenSetter() {
   const { getToken, isSignedIn } = useAuth();
@@ -11,6 +12,9 @@ export default function AuthTokenSetter() {
     async function setToken() {
       if (isSignedIn) {
         try {
+          // register getToken so non-React modules (axios) can refresh when needed
+          setGetToken(getToken);
+
           const token = await getToken();
           if (!mounted) return;
           if (token) {
@@ -28,6 +32,7 @@ export default function AuthTokenSetter() {
         }
       } else {
         delete axiosInstance.defaults.headers.common["Authorization"];
+        setGetToken(null);
       }
     }
 
